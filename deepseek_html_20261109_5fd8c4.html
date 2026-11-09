@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Lab XL — Flight 10: Can, Could & Time</title>
+<style>
+  :root{
+    --navy:#0b1f3a; --sky:#1ea7e8; --amber:#f5a623;
+    --green:#28c76f; --red:#ea5455; --yellow:#f5c518;
+    --ink:#122036; --paper:#f4f8fc; --card:#fff; --muted:#6b7c93;
+    --radius:14px; --shadow:0 8px 24px rgba(11,31,58,.12);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);}
+  body{min-height:100vh;}
+
+  header.topbar{background:linear-gradient(135deg,var(--navy) 0%,#122a4d 100%);color:#fff;padding:18px 18px 14px;position:sticky;top:0;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.22);}
+  .topbar-inner{max-width:900px;margin:0 auto;}
+  .badge{display:inline-block;background:var(--sky);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:1px;padding:4px 11px;border-radius:20px;text-transform:uppercase;margin-bottom:8px;}
+  header.topbar h1{margin:0 0 4px;font-size:clamp(18px,3.4vw,24px);}
+  header.topbar p{margin:0 0 12px;color:#b9c8de;font-size:12.5px;line-height:1.5;}
+  
+  nav.phasenav{display:flex;gap:6px;flex-wrap:wrap;}
+  nav.phasenav button{flex:1 1 100px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#dce6f5;padding:8px 6px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer;transition:.2s;text-align:center;}
+  nav.phasenav button.active{background:var(--sky);border-color:var(--sky);color:#fff;}
+  nav.phasenav button:hover:not(.active){background:rgba(255,255,255,0.16);}
+  .progress-outer{height:6px;background:rgba(255,255,255,0.15);border-radius:6px;margin-top:10px;overflow:hidden;}
+  .progress-inner{height:100%;width:0%;background:linear-gradient(90deg,var(--sky),var(--amber));transition:width .4s ease;}
+
+  main{max-width:900px;margin:0 auto;padding:26px 18px 70px;}
+  .phase{display:none;animation:fadeIn .4s ease;}
+  .phase.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  
+  .phase-title{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .phase-title .bar{width:5px;height:24px;background:var(--sky);border-radius:3px;}
+  .phase-title h2{margin:0;font-size:clamp(18px,3vw,22px);}
+  .phase-sub{color:var(--muted);margin:0 0 20px;font-size:13.5px;max-width:720px;line-height:1.5;}
+
+  .lab-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 24px;border:1px solid #e2ebf3;text-align:center;display:flex;flex-direction:column;align-items:center;min-height:420px;position:relative;}
+  
+  .progress-tracker{position:absolute;top:16px;right:20px;font-size:12px;font-weight:800;color:var(--muted);letter-spacing:1px;background:#eef4fb;padding:4px 10px;border-radius:12px;}
+  
+  .lbl-hint{font-size:11px;font-weight:800;color:var(--sky);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+  .target-text{font-size:clamp(20px,3.5vw,28px);font-weight:800;color:var(--navy);line-height:1.4;margin-bottom:24px;min-height:40px;max-width:700px;}
+  .target-text .blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--amber);color:var(--amber);}
+  
+  .audio-context{background:#eef4fb;padding:14px 18px;border-radius:10px;font-size:14px;color:var(--navy);font-weight:600;margin-bottom:24px;font-style:italic;max-width:600px;border-left:4px solid var(--sky);text-align:left;display:none;width:100%;}
+  .audio-context.show{display:block;}
+
+  .controls{display:flex;gap:16px;align-items:center;justify-content:center;margin-top:auto;margin-bottom:20px;}
+  .speak-btn{background:var(--sky);border:none;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;flex-shrink:0;transition:.15s;box-shadow:0 4px 12px rgba(30,167,232,.3);}
+  .speak-btn:hover{background:var(--navy);transform:scale(1.05);}
+  
+  .mic-btn{width:72px;height:72px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:32px;cursor:pointer;box-shadow:0 6px 20px rgba(234,84,85,.4);transition:.15s;display:flex;align-items:center;justify-content:center;}
+  .mic-btn:hover{transform:scale(1.06);}
+  .mic-btn.listening{animation:pulseMic 1s infinite;background:#c53030;}
+  @keyframes pulseMic{0%{box-shadow:0 0 0 0 rgba(234,84,85,.6);}70%{box-shadow:0 0 0 20px rgba(234,84,85,0);}100%{box-shadow:0 0 0 0 rgba(234,84,85,0);}}
+
+  .transcript-box{min-height:30px;font-size:14px;color:var(--muted);font-style:italic;margin-bottom:16px;}
+  
+  .word-eval{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;min-height:36px;}
+  .word-eval span{font-size:18px;font-weight:800;padding:4px 8px;border-radius:6px;}
+  .word-eval .w-good{background:#e8f9ee;color:var(--green);}
+  .word-eval .w-bad{background:#fdecec;color:var(--red);}
+  .word-eval .w-pending{color:var(--muted);}
+
+  .feedback{font-weight:800;font-size:15px;min-height:24px;margin-bottom:16px;}
+  .feedback.ok{color:var(--green);}
+  .feedback.bad{color:var(--red);}
+  .feedback.warn{color:var(--yellow);}
+
+  .nav-btn{background:var(--navy);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;transition:.15s;margin-top:10px;}
+  .nav-btn:hover{background:var(--sky);}
+  .nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+  .unsupported{background:#fff6e6;color:#8a6300;border-radius:12px;padding:14px;font-size:13px;font-weight:600;margin-top:10px;display:none;}
+  .unsupported.show{display:block;}
+
+  @media(max-width:600px){
+    nav.phasenav button{font-size:9.5px;padding:7px 4px;}
+    .lab-card{padding:20px 14px;}
+    .mic-btn{width:64px;height:64px;font-size:28px;}
+    .progress-tracker{top:10px;right:10px;font-size:10px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Flight 10 · Speaking Lab (XL)</span>
+    <h1>Can, Could &amp; Telling Aviation Time</h1>
+    <p>40 speaking exercises. Speak clearly into the microphone to pass.</p>
+    <nav class="phasenav" id="phaseNav">
+      <button class="phase-btn active" data-phase="1">1 · Time Drill</button>
+      <button class="phase-btn" data-phase="2">2 · Phrases</button>
+      <button class="phase-btn" data-phase="3">3 · Roleplay</button>
+      <button class="phase-btn" data-phase="4">4 · Speak Gap</button>
+    </nav>
+    <div class="progress-outer"><div class="progress-inner" id="topProgress"></div></div>
+  </div>
+</header>
+
+<main>
+  <!-- SECTION 1: TIME DRILL -->
+  <section class="phase active" id="phase1">
+    <div class="phase-title"><span class="bar"></span><h2>Zulu Time Drill</h2></div>
+    <p class="phase-sub">Read the 24-hour format digit by digit, followed by the word "Zulu". (e.g., 0315Z → "Zero three one five Zulu").</p>
+    <div class="lab-card">
+      <div class="progress-tracker" id="t1-progress">1 / 10</div>
+      <div class="lbl-hint">Read this time aloud</div>
+      <div class="target-text" id="t1-target">0315Z</div>
+      
+      <div class="controls">
+        <button class="speak-btn" id="t1-listen">🔊</button>
+        <button class="mic-btn" id="t1-mic">🎙️</button>
+      </div>
+      
+      <div class="transcript-box" id="t1-transcript">&nbsp;</div>
+      <div class="word-eval" id="t1-eval"></div>
+      <div class="feedback" id="t1-feedback">&nbsp;</div>
+      <button class="nav-btn" id="t1-next" style="display:none;">Next Time →</button>
+      <div class="unsupported" id="t1-unsupported">🎙️ Speech recognition not supported. Try Google Chrome or Edge.</div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: PHRASE PRACTICE -->
+  <section class="phase" id="phase2">
+    <div class="phase-title"><span class="bar"></span><h2>Phrase Practice</h2></div>
+    <p class="phase-sub">Read the aviation sentences using <strong>Can</strong>, <strong>Could</strong>, and action verbs.</p>
+    <div class="lab-card">
+      <div class="progress-tracker" id="t2-progress">1 / 10</div>
+      <div class="lbl-hint">Read the sentence aloud</div>
+      <div class="target-text" id="t2-target">We can land on Runway zero nine.</div>
+      
+      <div class="controls">
+        <button class="speak-btn" id="t2-listen">🔊</button>
+        <button class="mic-btn" id="t2-mic">🎙️</button>
+      </div>
+      
+      <div class="transcript-box" id="t2-transcript">&nbsp;</div>
+      <div class="word-eval" id="t2-eval"></div>
+      <div class="feedback" id="t2-feedback">&nbsp;</div>
+      <button class="nav-btn" id="t2-next" style="display:none;">Next Phrase →</button>
+    </div>
+  </section>
+
+  <!-- SECTION 3: ROLEPLAY -->
+  <section class="phase" id="phase3">
+    <div class="phase-title"><span class="bar"></span><h2>ATC Roleplay</h2></div>
+    <p class="phase-sub">Listen to the ATC prompt. Then, read the correct pilot response aloud.</p>
+    <div class="lab-card">
+      <div class="progress-tracker" id="t3-progress">1 / 10</div>
+      <div class="audio-context" id="t3-context">ATC: Could you confirm your ETA at the intersection?</div>
+      <div class="lbl-hint">Your Response</div>
+      <div class="target-text" id="t3-target">Roger. Cessna 172 can arrive at one five four zero Zulu.</div>
+      
+      <div class="controls">
+        <button class="speak-btn" id="t3-listen">🔊</button>
+        <button class="mic-btn" id="t3-mic">🎙️</button>
+      </div>
+      
+      <div class="transcript-box" id="t3-transcript">&nbsp;</div>
+      <div class="word-eval" id="t3-eval"></div>
+      <div class="feedback" id="t3-feedback">&nbsp;</div>
+      <button class="nav-btn" id="t3-next" style="display:none;">Next Scenario →</button>
+    </div>
+  </section>
+
+  <!-- SECTION 4: SPEAK THE GAP -->
+  <section class="phase" id="phase4">
+    <div class="phase-title"><span class="bar"></span><h2>Speak the Gap</h2></div>
+    <p class="phase-sub">Read the sentence aloud, filling in the missing word based on the hint.</p>
+    <div class="lab-card">
+      <div class="progress-tracker" id="t4-progress">1 / 10</div>
+      <div class="lbl-hint">Complete the sentence</div>
+      <div class="target-text" id="t4-target">The pilot <span class="blank">_____</span> synchronize the clock.</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;" id="t4-hint">Hint: Impossibility (negative past)</div>
+      
+      <div class="controls">
+        <button class="speak-btn" id="t4-listen">🔊</button>
+        <button class="mic-btn" id="t4-mic">🎙️</button>
+      </div>
+      
+      <div class="transcript-box" id="t4-transcript">&nbsp;</div>
+      <div class="word-eval" id="t4-eval"></div>
+      <div class="feedback" id="t4-feedback">&nbsp;</div>
+      <button class="nav-btn" id="t4-next" style="display:none;">Next Sentence →</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ============================================================
+   DATA (40 EXERCISES)
+============================================================ */
+const TIME_DRILL = [
+  { display: '0315Z', speech: 'Zero three one five Zulu' },
+  { display: '1430Z', speech: 'One four three zero Zulu' },
+  { display: '2000Z', speech: 'Two zero zero zero Zulu' },
+  { display: '1540Z', speech: 'One five four zero Zulu' },
+  { display: '0925Z', speech: 'Zero nine two five Zulu' },
+  { display: '0800Z', speech: 'Zero eight zero zero Zulu' },
+  { display: '1230Z', speech: 'One two three zero Zulu' },
+  { display: '1745Z', speech: 'One seven four five Zulu' },
+  { display: '2215Z', speech: 'Two two one five Zulu' },
+  { display: '0605Z', speech: 'Zero six zero five Zulu' }
+];
+
+const PHRASES = [
+  'We can land on Runway zero nine.',
+  'Could we request a delay of ten minutes?',
+  'The pilot could not synchronize the clock.',
+  'Can you confirm your ETA?',
+  'Please readback the instruction.',
+  'The crew can depart on schedule.',
+  'Could you adjust your speed?',
+  'We could not authorize the takeoff.',
+  'The captain can coordinate with the ramp.',
+  'You must synchronize your wristwatches.'
+];
+
+const ROLEPLAY = [
+  { 
+    context: 'ATC: Could you confirm your ETA at the intersection?', 
+    response: 'Roger. Cessna 172 can arrive at one five four zero Zulu.' 
+  },
+  { 
+    context: 'ATC: Can you synchronize your wristwatches before we start?', 
+    response: 'Yes, we can synchronize our wristwatches.' 
+  },
+  { 
+    context: 'ATC: Why could not the crew depart at schedule?', 
+    response: 'The crew could not depart due to a slot delay.' 
+  },
+  { 
+    context: 'ATC: Can you readback the clearance?', 
+    response: 'I can readback the clearance.' 
+  },
+  { 
+    context: 'ATC: Could we postpone the departure?', 
+    response: 'Yes, we could postpone the departure.' 
+  },
+  { 
+    context: 'ATC: Can the aircraft adjust its heading?', 
+    response: 'The aircraft can adjust its heading.' 
+  },
+  { 
+    context: 'ATC: Could you confirm the ETD?', 
+    response: 'We could confirm the ETD at zero eight zero zero Zulu.' 
+  },
+  { 
+    context: 'ATC: Can you coordinate with the ramp?', 
+    response: 'We can coordinate with the ramp.' 
+  },
+  { 
+    context: 'ATC: Why could you not arrive on time?', 
+    response: 'We could not arrive due to a time zone difference.' 
+  },
+  { 
+    context: 'ATC: Can you check your chronometer?', 
+    response: 'Yes, we can check the chronometer.' 
+  }
+];
+
+const GAP_FILL = [
+  { sentence: 'The pilot _____ synchronize the clock.', hint: 'Impossibility (negative past)', full: 'The pilot could not synchronize the clock.' },
+  { sentence: '_____ we request a delay of ten minutes?', hint: 'Formal permission', full: 'Could we request a delay of ten minutes?' },
+  { sentence: 'We _____ land on Runway zero nine.', hint: 'Technical ability', full: 'We can land on Runway zero nine.' },
+  { sentence: 'ATC _____ us to land on Runway zero nine.', hint: 'Action verb for permission (past)', full: 'ATC authorized us to land on Runway zero nine.' },
+  { sentence: 'You must _____ the instruction.', hint: 'Action verb for repeating', full: 'You must readback the instruction.' },
+  { sentence: 'We can _____ with the ramp.', hint: 'Action verb for organizing', full: 'We can coordinate with the ramp.' },
+  { sentence: 'The captain could not _____ the departure.', hint: 'Action verb for delaying', full: 'The captain could not postpone the departure.' },
+  { sentence: 'Could you _____ the time zone?', hint: 'Action verb for verifying', full: 'Could you confirm the time zone?' },
+  { sentence: 'We can _____ at zero nine zero zero Zulu.', hint: 'Action verb for leaving', full: 'We can depart at zero nine zero zero Zulu.' },
+  { sentence: 'The crew can _____ the wristwatches.', hint: 'Action verb for adjusting time', full: 'The crew can synchronize the wristwatches.' }
+];
+
+/* ============================================================
+   STATE & SPEECH SETUP
+============================================================ */
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let isListening = false;
+
+function speak(text, rate = 0.85){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = rate; u.pitch = 1;
+  const v = window.speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('en'));
+  if(v) u.voice = v;
+  window.speechSynthesis.speak(u);
+}
+setTimeout(()=>{ if('speechSynthesis' in window) window.speechSynthesis.getVoices(); }, 400);
+
+// Normalization & Scoring
+function normalizeText(str) {
+  let s = str.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+  const numMap = {
+    '0':'zero','1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine'
+  };
+  if (/^\d+$/.test(s)) {
+    s = s.split('').map(d => numMap[d]).join(' ');
+  } else {
+    s = s.split(' ').map(w => {
+      if(/^\d+$/.test(w)) return w.split('').map(d => numMap[d]).join(' ');
+      return w;
+    }).join(' ');
+  }
+  s = s.replace(/\boh\b/g, 'zero');
+  return s.split(/\s+/).filter(Boolean);
+}
+
+function playDing(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [880, 1320].forEach((freq, i)=>{
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type='sine'; osc.frequency.value=freq;
+      const st = ctx.currentTime + i*0.09;
+      gain.gain.setValueAtTime(0.0001, st);
+      gain.gain.exponentialRampToValueAtTime(0.2, st+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, st+0.25);
+      osc.connect(gain).connect(ctx.destination); osc.start(st); osc.stop(st+0.28);
+    });
+  }catch(e){}
+}
+function playBuzz(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type='sawtooth'; osc.frequency.value=130;
+    const st = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, st);
+    gain.gain.exponentialRampToValueAtTime(0.15, st+0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, st+0.35);
+    osc.connect(gain).connect(ctx.destination); osc.start(st); osc.stop(st+0.38);
+  }catch(e){}
+}
+
+function requestMic(targetText, evalContainer, feedbackEl, transcriptEl, nextBtn, onSuccess){
+  if(!SpeechRecognitionAPI){
+    document.getElementById('t1-unsupported').classList.add('show');
+    return;
+  }
+  if(isListening) return;
+  
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+      stream.getTracks().forEach(t => t.stop());
+      startRecognition(targetText, evalContainer, feedbackEl, transcriptEl, nextBtn, onSuccess);
+    }).catch(() => {
+      feedbackEl.textContent = '🎙️ Microphone permission required.';
+      feedbackEl.className = 'feedback bad';
+    });
+  } else {
+    startRecognition(targetText, evalContainer, feedbackEl, transcriptEl, nextBtn, onSuccess);
+  }
+}
+
+function startRecognition(targetText, evalContainer, feedbackEl, transcriptEl, nextBtn, onSuccess){
+  const rec = new SpeechRecognitionAPI();
+  rec.lang = 'en-US'; rec.interimResults = false; rec.maxAlternatives = 4;
+  
+  isListening = true;
+  const allMics = document.querySelectorAll('.mic-btn');
+  allMics.forEach(m => m.classList.add('listening'));
+  transcriptEl.textContent = 'Listening...';
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'feedback';
+  evalContainer.innerHTML = '';
+  nextBtn.style.display = 'none';
+
+  rec.onresult = (event) => {
+    let bestHeard = event.results[0][0].transcript;
+    let bestScore = 0;
+    let bestMatchData = null;
+
+    const targetWords = normalizeText(targetText);
+    
+    for(let i=0; i<event.results[0].length; i++){
+      let heard = event.results[0][i].transcript;
+      let heardWords = normalizeText(heard);
+      
+      let score = 0;
+      let matches = [];
+      let targetCopy = [...targetWords];
+      
+      heardWords.forEach(hw => {
+        let idx = targetCopy.indexOf(hw);
+        if(idx !== -1){
+          score++;
+          matches.push({ word: hw, status: 'good', targetIdx: idx });
+          targetCopy[idx] = null; 
+        } else {
+          matches.push({ word: hw, status: 'bad' });
+        }
+      });
+      
+      let finalScore = targetWords.length > 0 ? score / targetWords.length : 0;
+      if(finalScore > bestScore){
+        bestScore = finalScore;
+        bestHeard = heard;
+        bestMatchData = { score, matches, targetWords };
+      }
+    }
+
+    transcriptEl.textContent = `You said: "${bestHeard}"`;
+    
+    let html = '';
+    bestMatchData.matches.forEach(m => {
+      if(m.status === 'good'){
+        html += `<span class="w-good">${m.word}</span> `;
+      } else {
+        html += `<span class="w-bad">${m.word}</span> `;
+      }
+    });
+    
+    if(bestMatchData.score < bestMatchData.targetWords.length){
+      let matchedWords = bestMatchData.matches.filter(m=>m.status==='good').map(m=>m.word);
+      bestMatchData.targetWords.forEach(tw => {
+        let idx = matchedWords.indexOf(tw);
+        if(idx !== -1) matchedWords.splice(idx, 1);
+        else html += `<span class="w-pending">[${tw}]</span> `;
+      });
+    }
+    
+    evalContainer.innerHTML = html;
+
+    if(bestScore >= 0.6){
+      feedbackEl.textContent = `✅ Great! Clear pronunciation. (${Math.round(bestScore*100)}%)`;
+      feedbackEl.className = 'feedback ok';
+      playDing();
+      nextBtn.style.display = 'inline-block';
+      nextBtn.onclick = () => {
+        nextBtn.style.display = 'none';
+        onSuccess();
+      };
+    } else {
+      feedbackEl.textContent = `❌ Try again. Listen to the audio and speak clearly. (${Math.round(bestScore*100)}%)`;
+      feedbackEl.className = 'feedback bad';
+      playBuzz();
+    }
+  };
+
+  rec.onerror = () => {
+    isListening = false;
+    allMics.forEach(m => m.classList.remove('listening'));
+    feedbackEl.textContent = '🎙️ Audio error. Try again.';
+    feedbackEl.className = 'feedback bad';
+  };
+
+  rec.onend = () => {
+    isListening = false;
+    allMics.forEach(m => m.classList.remove('listening'));
+  };
+
+  rec.start();
+}
+
+/* ============================================================
+   RENDER FUNCTIONS
+============================================================ */
+let t1Index = 0;
+function renderTimeDrill(){
+  const tracker = document.getElementById('t1-progress');
+  if(t1Index >= TIME_DRILL.length){
+    document.getElementById('t1-target').textContent = 'All times completed! 🎉';
+    document.getElementById('t1-mic').style.display = 'none';
+    document.getElementById('t1-listen').style.display = 'none';
+    document.getElementById('t1-next').style.display = 'none';
+    document.getElementById('t1-feedback').textContent = '';
+    tracker.textContent = 'DONE';
+    return;
+  }
+  tracker.textContent = `${t1Index + 1} / ${TIME_DRILL.length}`;
+  const item = TIME_DRILL[t1Index];
+  document.getElementById('t1-target').textContent = item.display;
+  
+  document.getElementById('t1-listen').onclick = () => speak(item.speech);
+  document.getElementById('t1-mic').onclick = () => {
+    requestMic(item.speech, document.getElementById('t1-eval'), document.getElementById('t1-feedback'), document.getElementById('t1-transcript'), document.getElementById('t1-next'), () => { t1Index++; renderTimeDrill(); });
+  };
+  
+  document.getElementById('t1-eval').innerHTML = '';
+  document.getElementById('t1-transcript').innerHTML = '&nbsp;';
+  document.getElementById('t1-feedback').innerHTML = '&nbsp;';
+  document.getElementById('t1-next').style.display = 'none';
+  setTimeout(() => speak(item.speech), 500);
+}
+
+let t2Index = 0;
+function renderPhrasePractice(){
+  const tracker = document.getElementById('t2-progress');
+  if(t2Index >= PHRASES.length){
+    document.getElementById('t2-target').textContent = 'All phrases completed! 🎉';
+    document.getElementById('t2-mic').style.display = 'none';
+    document.getElementById('t2-listen').style.display = 'none';
+    document.getElementById('t2-next').style.display = 'none';
+    tracker.textContent = 'DONE';
+    return;
+  }
+  tracker.textContent = `${t2Index + 1} / ${PHRASES.length}`;
+  const text = PHRASES[t2Index];
+  document.getElementById('t2-target').textContent = text;
+  
+  document.getElementById('t2-listen').onclick = () => speak(text);
+  document.getElementById('t2-mic').onclick = () => {
+    requestMic(text, document.getElementById('t2-eval'), document.getElementById('t2-feedback'), document.getElementById('t2-transcript'), document.getElementById('t2-next'), () => { t2Index++; renderPhrasePractice(); });
+  };
+  
+  document.getElementById('t2-eval').innerHTML = '';
+  document.getElementById('t2-transcript').innerHTML = '&nbsp;';
+  document.getElementById('t2-feedback').innerHTML = '&nbsp;';
+  document.getElementById('t2-next').style.display = 'none';
+  setTimeout(() => speak(text), 500);
+}
+
+let t3Index = 0;
+function renderRoleplay(){
+  const tracker = document.getElementById('t3-progress');
+  if(t3Index >= ROLEPLAY.length){
+    document.getElementById('t3-target').textContent = 'All scenarios completed! 🎉';
+    document.getElementById('t3-context').classList.remove('show');
+    document.getElementById('t3-mic').style.display = 'none';
+    document.getElementById('t3-listen').style.display = 'none';
+    document.getElementById('t3-next').style.display = 'none';
+    tracker.textContent = 'DONE';
+    return;
+  }
+  tracker.textContent = `${t3Index + 1} / ${ROLEPLAY.length}`;
+  const item = ROLEPLAY[t3Index];
+  const contextEl = document.getElementById('t3-context');
+  contextEl.textContent = item.context;
+  contextEl.classList.add('show');
+  
+  document.getElementById('t3-target').textContent = item.response;
+  document.getElementById('t3-listen').onclick = () => speak(item.context);
+  document.getElementById('t3-mic').onclick = () => {
+    requestMic(item.response, document.getElementById('t3-eval'), document.getElementById('t3-feedback'), document.getElementById('t3-transcript'), document.getElementById('t3-next'), () => { t3Index++; renderRoleplay(); });
+  };
+  
+  document.getElementById('t3-eval').innerHTML = '';
+  document.getElementById('t3-transcript').innerHTML = '&nbsp;';
+  document.getElementById('t3-feedback').innerHTML = '&nbsp;';
+  document.getElementById('t3-next').style.display = 'none';
+  setTimeout(() => speak(item.context), 500);
+}
+
+let t4Index = 0;
+function renderGapFill(){
+  const tracker = document.getElementById('t4-progress');
+  if(t4Index >= GAP_FILL.length){
+    document.getElementById('t4-target').textContent = 'All gaps completed! 🎉';
+    document.getElementById('t4-mic').style.display = 'none';
+    document.getElementById('t4-listen').style.display = 'none';
+    document.getElementById('t4-next').style.display = 'none';
+    tracker.textContent = 'DONE';
+    return;
+  }
+  tracker.textContent = `${t4Index + 1} / ${GAP_FILL.length}`;
+  const item = GAP_FILL[t4Index];
+  document.getElementById('t4-target').innerHTML = item.sentence.replace('_____', '<span class="blank">_____</span>');
+  document.getElementById('t4-hint').textContent = 'Hint: ' + item.hint;
+  
+  document.getElementById('t4-listen').onclick = () => speak(item.full);
+  document.getElementById('t4-mic').onclick = () => {
+    requestMic(item.full, document.getElementById('t4-eval'), document.getElementById('t4-feedback'), document.getElementById('t4-transcript'), document.getElementById('t4-next'), () => { t4Index++; renderGapFill(); });
+  };
+  
+  document.getElementById('t4-eval').innerHTML = '';
+  document.getElementById('t4-transcript').innerHTML = '&nbsp;';
+  document.getElementById('t4-feedback').innerHTML = '&nbsp;';
+  document.getElementById('t4-next').style.display = 'none';
+  setTimeout(() => speak(item.full), 500);
+}
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+const phaseBtns = document.querySelectorAll('.phase-btn');
+const phases = document.querySelectorAll('.phase');
+
+function goToPhase(n){
+  phases.forEach(p => p.classList.remove('active'));
+  phaseBtns.forEach(b => b.classList.remove('active'));
+  document.getElementById('phase'+n).classList.add('active');
+  document.querySelector(`.phase-btn[data-phase="${n}"]`).classList.add('active');
+  document.getElementById('topProgress').style.width = (n/4*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  
+  if(n === 1) setTimeout(renderTimeDrill, 100);
+  if(n === 2) setTimeout(renderPhrasePractice, 100);
+  if(n === 3) setTimeout(renderRoleplay, 100);
+  if(n === 4) setTimeout(renderGapFill, 100);
+}
+
+phaseBtns.forEach(btn => btn.addEventListener('click', () => goToPhase(parseInt(btn.dataset.phase))));
+
+/* INIT */
+renderTimeDrill();
+</script>
+</body>
+</html>
